@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "lunchroom-supervisors-client-side-solution",
+    "id": "34b936de-e04f-485a-b3d6-b2ae9740d634",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.17.1"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "lunchroom-supervisors description"
+      },
+      "longDescription": {
+        "default": "lunchroom-supervisors description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "lunchroom-supervisors Feature",
+        "description": "The feature that activates elements of the lunchroom-supervisors solution.",
+        "id": "6918e319-2211-485f-abfa-e75c8a4ac22b",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/lunchroom-supervisors.sppkg"
+  }
+}

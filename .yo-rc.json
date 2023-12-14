@@ -1,0 +1,21 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "12.22.10",
+    "sdksVersions": {
+      "@microsoft/microsoft-graph-client": "3.0.2",
+      "@microsoft/teams-js": "2.9.1"
+    },
+    "version": "1.17.1",
+    "libraryName": "lunchroom-supervisors",
+    "libraryId": "34b936de-e04f-485a-b3d6-b2ae9740d634",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "lunchroom-supervisors",
+    "solutionShortDescription": "lunchroom-supervisors description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}
