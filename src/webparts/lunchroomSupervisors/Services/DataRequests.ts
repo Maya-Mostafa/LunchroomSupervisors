@@ -1,88 +1,69 @@
 import { WebPartContext } from "@microsoft/sp-webpart-base";
 import {SPHttpClient, ISPHttpClientOptions} from "@microsoft/sp-http";
 import { AllocationDataType } from "./Types";
+import { IDropdownOption } from "office-ui-fabric-react";
+import { AadHttpClient } from '@microsoft/sp-http';
 
-export const getEmpInfo = async (context: WebPartContext, empNo: string) => {
+/* Utility Functions */
+export const objToMap = (arrObjs: any, key: string) => {
+  return arrObjs.reduce((map: any, obj: any) => (map[obj[key]] = obj, map), {});
+};
 
-  const responseUrl = `https://pdsb1.sharepoint.com/sites/contentTypeHub/_api/web/lists/GetByTitle('Employees')/items?$filter=MMHubEmployeeNo eq ${empNo}`;
+/* Employees Information */
+export const getEmpPicture = (email: string) => {
+  return `https://pdsb1.sharepoint.com/_layouts/15/userphoto.aspx?size=S&username=${email}`
+};
+export const getEmpProfile = (email: string) => {
+  return `https://can.delve.office.com/?p=${email}`
+};
+export const getEmpInfo = async (context: WebPartContext, email: string) => {
+
+  const responseUrl = `https://pdsb1.sharepoint.com/sites/contentTypeHub/_api/web/lists/GetByTitle('Employees')/items?$filter=MMHubBoardEmail eq '${email}'`;
 
   try{
     const response = await context.spHttpClient.get(responseUrl, SPHttpClient.configurations.v1);
     if (response.ok){
       const results = await response.json();
+      console.log("getEmpInfo results", results);
       if(results){
-        return results;
+        return results.value;
       }
     }
   }catch(error){
     console.log("getEmpInfo fnc Error");
   }
 };
-
-export const getEmpPicture = (email: string) => {
-    return `https://pdsb1.sharepoint.com/_layouts/15/userphoto.aspx?size=S&username=${email}`
-};
-
-export const getEmpProfile = (email: string) => {
-    return `https://can.delve.office.com/?p=${email}`
-};
-
-export const getCRCStatus = async (empId: string) => {
-    const 
-        dt = new Date(),
-        currentYear = dt.getFullYear(),
-        currentMonth = dt.getMonth();
-    let CRCYr;
-
-    if (currentMonth < 3) CRCYr = currentYear - 1;
-    else CRCYr = currentYear;
-
-    const responseUrl = `https://pdsbserviceapi.azurewebsites.net/api/wcf/GetCourseStatus?EmpId=${empId}&CourseName=OD${CRCYr}`;
+export const getEmpsInfoQuery = async (context: WebPartContext, query: string) => {
+  const responseUrl = `https://pdsb1.sharepoint.com/sites/contentTypeHub/_api/web/lists/GetByTitle('Employees')/items?$filter=${query}`;
     try{
-        const response = await fetch(responseUrl);
-        if (response.ok){
-          const results = await response.json();
-          if(results){
-            return results;
-          }
+      const response = await context.spHttpClient.get(responseUrl, SPHttpClient.configurations.v1);
+      if (response.ok){
+        const results = await response.json();
+        if(results){
+          return results.value;
         }
-      }catch(error){
-        console.log("getCRCStatus fnc Error");
       }
+    }catch(error){
+      console.log("getEmpsInfoQuery fnc Error");
+    }
 };
 
-export const getSupervisors = async (locNo: string) => {
-    const responseUrl = `https://pdsbserviceapi.azurewebsites.net/api/wcf/GetLunchRoomSupByLocation?LocationId=${locNo}`;
-    try{
-        const response = await fetch(responseUrl);
-        if (response.ok){
-          const results = await response.json();
-          if(results){
-            return results;
+/* Locations */
+export const getAllLocations = async (context: WebPartContext) : Promise <IDropdownOption[]> => {
+  const responseUrl : string = `https://pdsb1.sharepoint.com/sites/contentTypeHub/_api/web/Lists/GetByTitle('schools')/items?$top=400&$orderBy=School_x0020_Name`; 
+  const response = await context.spHttpClient.get(responseUrl, SPHttpClient.configurations.v1);
+
+  if(response.ok){
+      const results = await response.json();
+      return results.value.map((school: any) => {
+          return {
+              key: school.School_x0020_Location_x0020_Code, 
+              text: `${school.School_x0020_Name} (${school.School_x0020_Location_x0020_Code})`
           }
-        }
-      }catch(error){
-        console.log("getAllocations fnc Error");
-      }
+      });
+  }
+
 };
-
-export const userAllocations = async (context: WebPartContext, locId: string, formType: string) => {
-    //formType: Current, Transferring
-    const responseUrl = `https://pdsb1.sharepoint.com/hr/business/apppackages/_api/web/lists/GetByTitle('LunchroomApplication')/items?$filter=FormType eq '${formType}' and SchoolLocationCode eq '${locId}')`;
-
-    try{
-        const response = await context.spHttpClient.get(responseUrl, SPHttpClient.configurations.v1);
-        if (response.ok){
-          const results = await response.json();
-          if(results){
-            return results;
-          }
-        }
-      }catch(error){
-        console.log("userAllocations fnc Error");
-      }
-}; 
-
 const getMyLocationsInfo = async (context: WebPartContext, locNum: string) =>{
     const   restUrl = `/sites/contentTypeHub/_api/web/Lists/GetByTitle('schools')/items?$select=Title,School_x0020_My_x0020_School_x00,School_x0020_Name&$filter=Title eq '${locNum}'`,
             _data = await context.spHttpClient.get(restUrl, SPHttpClient.configurations.v1);
@@ -105,7 +86,7 @@ const getMyLocations = async (context: WebPartContext, testingEmail: string) =>{
     return myLocsNum.filter(loc => loc !== '0089');
     //return myLocsNum;
 };
-export const getMyLocsDpd = async (context: WebPartContext, testingEmail: string) =>{
+export const getMyLocsDpd = async (context: WebPartContext, testingEmail?: string) =>{
     const currUserEmail = testingEmail ? testingEmail : context.pageContext.user.email;
     const myLocsNos = await getMyLocations(context, currUserEmail).then(r=>r);
     const myLocsDpd = [];
@@ -118,8 +99,79 @@ export const getMyLocsDpd = async (context: WebPartContext, testingEmail: string
     return Promise.all(myLocsDpd);
 };
 
-// for create allocation (formType: Current) or add and employee (formType: Transferring)
+/* CRC */
+export const getCRCYear = () =>{
+  const 
+        dt = new Date(),
+        currentYear = dt.getFullYear(),
+        currentMonth = dt.getMonth();
+    let CRCYr;
+
+    if (currentMonth < 3) CRCYr = currentYear - 1;
+    else CRCYr = currentYear;
+
+    return CRCYr;
+};
+export const getCRCStatus = async (context: WebPartContext, empId: string, CRCYr: number) => {
+    const responseUrl = `https://pdsbserviceapi.azurewebsites.net/api/wcf/GetCourseStatus?EmpId=${empId}&CourseName=OD${CRCYr}`;
+    const apiId : string = "eb994916-2c73-4bc6-b4bd-c945f62eac26";
+    
+    const aadHttpClient = await context.aadHttpClientFactory.getClient(apiId);
+    const response = await aadHttpClient.get(responseUrl, AadHttpClient.configurations.v1);
+    const results = await response.json();
+    return results.odStatus;
+};
+
+/* Supervisors Info */
+export const getSupervisors = async (context:WebPartContext, locNo: string) => {
+
+  const responseUrl = `https://pdsbserviceapi.azurewebsites.net/api/wcf/GetLunchRoomSupByLocation?LocationId=${locNo}`;
+  const apiId : string = "eb994916-2c73-4bc6-b4bd-c945f62eac26";
+  
+  const aadHttpClient = await context.aadHttpClientFactory.getClient(apiId);
+  const response = await aadHttpClient.get(responseUrl, AadHttpClient.configurations.v1);
+  const results = await response.json();
+  return results;
+};
+export const getSupervisorsInfo = async (context: WebPartContext, locNo: string) => {
+
+  const supersPNos = await getSupervisors(context, locNo);
+
+  if (supersPNos){
+    const pNumsArr = JSON.parse(supersPNos).map((item: any) => item.P_NUMBER.replace('P','00'));
+    
+    let query = '';
+    for (let i = 0; i < pNumsArr.length; i++){
+      query += `MMHubEmployeeNo eq '${pNumsArr[i]}'`;
+      if (i !== pNumsArr.length -1) query += ' or ';
+    }
+    
+    const empInfoResults = await getEmpsInfoQuery(context, query);
+    return empInfoResults;
+  }
+  return [];
+};
+
+/* Allocations Info */
+export const getEmpAllocations = async (context: WebPartContext, locId: string, formType: string) => {
+    //formType: Current, Transferring
+    const responseUrl = `https://pdsb1.sharepoint.com/hr/business/apppackages/_api/web/lists/GetByTitle('LunchroomApplication')/items?$filter=FormType eq '${formType}' and SchoolLocationCode eq '${locId}'`;
+
+    try{
+        const response = await context.spHttpClient.get(responseUrl, SPHttpClient.configurations.v1);
+        if (response.ok){
+          const results = await response.json();
+          if(results){
+            return objToMap(results.value, 'Title');
+          }
+        }
+      }catch(error){
+        console.log("userAllocations fnc Error");
+      }
+}; 
 export const createAllocation = async (context: WebPartContext, allocationData : AllocationDataType, formType: string) => {
+  // for create allocation (formType: Current) or add and employee (formType: Transferring)
+
     const responseUrl = `https://pdsb1.sharepoint.com/hr/business/apppackages/_api/web/lists/GetByTitle('LunchroomApplication')/items`;
 
     const body: string = JSON.stringify({
@@ -157,7 +209,6 @@ export const createAllocation = async (context: WebPartContext, allocationData :
         console.log('New Allocation is added!');
     }
 };
-
 export const updateAllocation = async (context: WebPartContext, allocationData : AllocationDataType) => {
     const responseUrl = `https://pdsb1.sharepoint.com/hr/business/apppackages/_api/web/lists/GetByTitle('LunchroomApplication')/items`;
 
@@ -194,3 +245,9 @@ export const updateAllocation = async (context: WebPartContext, allocationData :
 export const searchEmp = () => {
     return;
 };
+
+
+
+
+
+

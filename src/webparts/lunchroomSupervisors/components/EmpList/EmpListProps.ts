@@ -1,5 +1,8 @@
 import { WebPartContext } from "@microsoft/sp-webpart-base";
 
-export interface SchoolYearProps{
+export interface EmpListProps{
+    emps: any;
     context: WebPartContext;
+    crcYr: number;
+    allocations: any;
 }
