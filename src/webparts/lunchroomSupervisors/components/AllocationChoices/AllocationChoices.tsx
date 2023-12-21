@@ -5,7 +5,7 @@ import styles from '../LunchroomSupervisors.module.scss';
 
 export default function AllocationChoices(props: AllocationChoicesProps) {
 
-  console.log("AllocationChoicesProps", props);
+  // console.log("AllocationChoicesProps", props);
 
   const regBg = '#92DDDB';
   const resignBg = '#FFCD70';
@@ -80,8 +80,7 @@ export default function AllocationChoices(props: AllocationChoicesProps) {
   }, [allocationProps]);
 
   const onCheckHandler = (checked: boolean, text: string) => {
-    console.log(text, checked);
-    setAllocationState(allocationState.map((item: any)=>{
+    const updatedChoices = allocationState.map((item: any)=>{
       switch(text){
         case 'Not Returning':
           if (item.text !== 'Not Returning') return {...item, checked: false};
@@ -94,7 +93,9 @@ export default function AllocationChoices(props: AllocationChoicesProps) {
           if (item.text === 'Not Returning' || item.text === 'Resign') return {...item, checked: false};
           return item;
       }
-    }));
+    });
+    setAllocationState(updatedChoices);
+    props.selectChoices(updatedChoices);
   };
 
   return (
@@ -112,6 +113,6 @@ export default function AllocationChoices(props: AllocationChoicesProps) {
         );
       })}
     </div>
-  );
+  )
 }
 
