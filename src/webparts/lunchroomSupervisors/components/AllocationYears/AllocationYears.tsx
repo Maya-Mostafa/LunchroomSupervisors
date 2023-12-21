@@ -2,14 +2,16 @@ import * as React from 'react';
 import { AllocationYearsProps } from "./AllocationYearsProps";
 import styles from '../LunchroomSupervisors.module.scss';
 import AllocationBtn from '../AllocationBtn/AllocationBtn';
+import { getCRCYear } from '../../Services/DataRequests';
 
 export default function AllocationYears (props: AllocationYearsProps) {
 
     const regBg = '#92DDDB';
+    const CRCYr = getCRCYear();
 
     const allocationsConst = [
         {
-          text: 'Current',
+          text: `Current up to June ${CRCYr}`,
           textCode: 'CurrentYear',
           type: 'Regular',
           selectedBg : regBg,
@@ -17,7 +19,7 @@ export default function AllocationYears (props: AllocationYearsProps) {
           disabled: false,
         },
         {
-          text: 'Next',
+          text: `Sept ${CRCYr} - June ${CRCYr+1}`,
           textCode: 'NextYear',
           type: 'Regular',
           selectedBg : regBg,
@@ -25,7 +27,6 @@ export default function AllocationYears (props: AllocationYearsProps) {
           disabled: false,
         },
     ];
-
 
     const selectedSchoolYear = props.allocation && props.allocation.SelectedSchoolYear;
     const allocationProps = props.allocation ? props.allocation.toString() : '';
@@ -46,10 +47,12 @@ export default function AllocationYears (props: AllocationYearsProps) {
 
 
     const onCheckHandler = (checked: boolean, text: string) => {
-        setAllocationState(allocationState.map((item: any)=>{
-            if (item.text === text) return {...item, checked: checked};
-            return {...item, checked: false};
-        }));
+      const updatedYears = allocationState.map((item: any)=>{
+        if (item.text === text) return {...item, checked: checked};
+        return {...item, checked: false};
+      });
+      setAllocationState(updatedYears);
+      props.selectYears(updatedYears);
     };
 
 
