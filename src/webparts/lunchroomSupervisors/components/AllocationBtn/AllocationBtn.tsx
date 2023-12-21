@@ -5,8 +5,6 @@ import styles from '../LunchroomSupervisors.module.scss';
 
 export default function AllocationBtn(props: AllocationBtnProps) {
 
-    //const [isChecked, setIsChecked] = React.useState(false);
-
     const onClickHandler = () => {
         props.onCheckHandler(!props.checked, props.text);
     };
