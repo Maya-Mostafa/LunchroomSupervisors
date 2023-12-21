@@ -9,35 +9,61 @@
     font-family: $ms-font-family-fallbacks;
   }
 }
-.links {
-  a {
-    text-decoration: none;
-    color: "[theme:link, default:#03787c]";
-    color: var(--link); // note: CSS Custom Properties support is limited to modern browsers only
-
-    &:hover {
-      text-decoration: underline;
-      color: "[theme:linkHovered, default: #014446]";
-      color: var(--linkHovered); // note: CSS Custom Properties support is limited to modern browsers only
-    }
+.peelLink {
+  text-decoration: none;
+  // color: "[theme:link, default:#03787c]";
+  // color: var(--link); // note: CSS Custom Properties support is limited to modern browsers only
+  color: #0078d4;
+  &:hover {
+    text-decoration: underline;
+    // color: "[theme:linkHovered, default: #014446]";
+    // color: var(--linkHovered); // note: CSS Custom Properties support is limited to modern browsers only
+    color: #0078d4;
   }
 }
+
+
 .empCard{
-  margin-top: 20px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  margin-bottom: 15px;
   .empJobTitle{
     font-size: 11px;
     color: #666;
   }
   .empPersonaCntnr{
-    width: 260px;
+    width: 250px;
+    max-width: 250px;
     box-shadow: 0px 0px 3px 2px #ddd;
     padding: 20px;
     margin-right: 10px;
     border-right: 1px solid #ddd;
+    position: relative;
     .empPersona{
       width: auto;
+      .empPersonaLink{
+        vertical-align: middle;
+        font-size: 11px;
+      }
+    }
+    .crc{
+      font-size: 11px;
+      font-weight: 600;
+      position: absolute;
+      right: 8px;
+      bottom: 6px;
+      i{
+        font-size: 13px;
+        vertical-align: bottom;
+        margin-right: 2px;
+        font-weight: 600;
+      }
+      .validOD{
+        color: #3ebb3e;
+      }
+      .invalidOD{
+        color: #ed6464;
+      }
     }
   }
   .allocationsChoices{
@@ -45,9 +71,44 @@
     .allocBtn{
       height: 90px;
       width: 80px;
-      margin: 0 5px;
+      margin: 0 3px;
     }
   }
+}
+
+.hdrCntnr{
+  display: flex;
+  flex-direction: row;
+  text-align: center;
+  font-weight: 600;
+  font-size: 13px;
+  margin: 25px 0 5px 0;
+  .hdrEmpInfo{
+    width: 292px;
+  }
+  .hdrChoices{
+    width: 527px;
+    .allocationNumbers{
+      display: flex;
+      padding-left: 15px;
+      margin-top: 3px;
+      .allocReg, .allocEarly, .allocSupp, .allocNeeds{
+        text-align: center;
+        width: 73px;
+        margin-right: 13px;
+      }
+    }
+  }
+  .hdrYear{
+    width: 182px;
+  }
+  .hdrEmail{
+    width: 96px;
+  }
+}
+
+.allocationsChoicesCntnr{
+  display: flex;
 }
 
 .yearChoices{
@@ -65,23 +126,26 @@
 
 .allocTop{
   display: flex;
+  hr{
+    margin: 0 3px;
+  }
 }
 .allocBottom{
   display: flex;
   justify-content: flex-end;
 }
 
-.crc{
-  float:right;
-}
+
 
 .allocEmailBtn{
-  span{
-    font-size: 11px;
-  }
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-content: center;
   align-items: center;
+  margin-left: 10px;
+  .sentOn{
+    font-size: 11px;
+    margin-top: 3px;
+  }
 }
