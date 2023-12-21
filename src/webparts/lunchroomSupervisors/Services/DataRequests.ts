@@ -162,13 +162,24 @@ export const getEmpAllocations = async (context: WebPartContext, locId: string, 
         if (response.ok){
           const results = await response.json();
           if(results){
-            return objToMap(results.value, 'Title');
+            return results.value;
+            // return objToMap(results.value, 'Title');
           }
         }
       }catch(error){
         console.log("userAllocations fnc Error");
       }
 }; 
+export const getAllocationCount = (arr: any) => {
+  let regCount = 0, earlyCount = 0, supplyCount = 0, needsCount = 0;
+  for (const item of arr){
+    if (item.ApplicationType.includes("RegularClasses")) regCount +=1;
+    if (item.ApplicationType.includes("EarlyLearningPlan")) earlyCount +=1;
+    if (item.ApplicationType.includes("Supply")) supplyCount +=1;
+    if (item.ApplicationType.includes("SpecialNeeds")) needsCount +=1;
+  }
+  return {regCount, earlyCount, supplyCount, needsCount};
+}
 export const createAllocation = async (context: WebPartContext, allocationData : AllocationDataType, formType: string) => {
   // for create allocation (formType: Current) or add and employee (formType: Transferring)
 
@@ -240,6 +251,26 @@ export const updateAllocation = async (context: WebPartContext, allocationData :
     if(_data.ok){
         console.log('Allocation is updated!');
     }
+};
+export const sentOn = (modDate: Date) => {
+  const months = ["Jan.", "Feb.", "Mar.", "Apr.", "May", "June", "July", "Aug.", "Sept.", "Oct.", "Nov.", "Dec."];
+  return  months[modDate.getMonth()] + ' ' + modDate.getDate();
+};
+export const isSendingValid = (choices: any, years: any) => {
+  let isChoicesValid = false, isYearsValid = false;
+  for (const choice of choices){
+    if (choice.checked){
+      isChoicesValid = true;
+      break;
+    }
+  }
+  for (const year of years){
+    if (year.checked){
+      isYearsValid = true;
+      break;
+    }
+  }
+  return isChoicesValid && isYearsValid;
 };
 
 export const searchEmp = () => {
