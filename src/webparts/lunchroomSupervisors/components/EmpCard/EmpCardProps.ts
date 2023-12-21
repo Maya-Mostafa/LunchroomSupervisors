@@ -5,4 +5,5 @@ export interface EmpCardProps{
     userInfo: any;
     crcYr: number;
     allocation: any;
+    selectChoicesYears: any;
 }
