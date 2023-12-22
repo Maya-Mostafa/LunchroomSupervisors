@@ -15,7 +15,9 @@ export default function AllocationYears (props: AllocationYearsProps) {
           textCode: 'CurrentYear',
           type: 'Regular',
           selectedBg : regBg,
+          origChecked: false,
           checked: false,
+          prevChecked: false,
           disabled: false,
         },
         {
@@ -23,7 +25,9 @@ export default function AllocationYears (props: AllocationYearsProps) {
           textCode: 'NextYear',
           type: 'Regular',
           selectedBg : regBg,
+          origChecked: false,
           checked: false,
+          prevChecked: false,
           disabled: false,
         },
     ];
@@ -37,7 +41,7 @@ export default function AllocationYears (props: AllocationYearsProps) {
         if (selectedSchoolYear){
             setAllocationState(allocationsConst.map((item: any)=>{
                 if (selectedSchoolYear.includes(item.textCode))
-                return {...item, checked: true, disabled: true};
+                return {...item, origChecked: true, checked: true, disabled: true};
                 return {...item, disabled: true};
             }));
         }else{
@@ -45,6 +49,14 @@ export default function AllocationYears (props: AllocationYearsProps) {
         }
     }, [allocationProps]);
 
+    React.useEffect(()=>{
+      if (props.openEdit){
+        setAllocationState(allocationState.map((item: any)=>{
+          if (item.origChecked) return {...item, checked: false, prevChecked: true, disabled: false};
+          return {...item, disabled: false};
+        }));
+      }
+    }, [props.openEdit]);
 
     const onCheckHandler = (checked: boolean, text: string) => {
       const updatedYears = allocationState.map((item: any)=>{
@@ -67,6 +79,7 @@ export default function AllocationYears (props: AllocationYearsProps) {
                 selectedBg = {allocation.selectedBg}
                 onCheckHandler={onCheckHandler}
                 disabled = {allocation.disabled}
+                prevChecked = {allocation.prevChecked}
               />
             );
           })}

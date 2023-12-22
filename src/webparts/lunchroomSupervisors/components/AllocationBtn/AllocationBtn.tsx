@@ -19,7 +19,7 @@ export default function AllocationBtn(props: AllocationBtnProps) {
             checked = {props.checked}
             text = {props.text}
             onClick = {onClickHandler}
-            className = {styles.allocBtn}
+            className = {props.prevChecked ? styles.allocBtn +' '+styles.allocBtnPrevChk : styles.allocBtn}
             style = {{backgroundColor : props.checked ? props.selectedBg : '#eee', color: fontColor}}
             disabled = {props.disabled}
         />

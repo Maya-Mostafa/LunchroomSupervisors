@@ -4,4 +4,5 @@ export default interface AllocationBtnProps{
     selectedBg: string;
     onCheckHandler: any;
     disabled: boolean;
+    prevChecked: boolean;
 }

@@ -6,14 +6,15 @@ import { getEmpPicture, getEmpProfile, isSendingValid, sentOn } from '../../Serv
 import styles from '../LunchroomSupervisors.module.scss';
 import AllocationChoices from '../AllocationChoices/AllocationChoices';
 import AllocationYears from '../AllocationYears/AllocationYears';
-import {  DefaultButton, IIconStyles, Icon, TeachingBubble } from 'office-ui-fabric-react';
-// import SchoolYears from '../SchoolYears/SchoolYears';
-import { useBoolean, useId } from '@fluentui/react-hooks';
+import {  DefaultButton, IIconStyles, Icon, TooltipHost } from 'office-ui-fabric-react';
+import { useId } from '@fluentui/react-hooks';
+import SelectBtn from '../SelectBtn/SelectBtn';
 
 export default function EmpCard (props: EmpCardProps) {
 
     // console.log("EmpCardProps", props);
 
+    const tooltipId = useId('tooltip');
     const iconStyles: Partial<IIconStyles> = { root: { marginRight: 5 } };
     const _onRenderSecondaryText = () =>{
         return (
@@ -23,36 +24,34 @@ export default function EmpCard (props: EmpCardProps) {
           </a>
         );
     };
+    const Tooltip = () => {
+        return(
+            <div>Please click on <b>Update</b> button first in order to process LRS, then select &nbsp;
+                <b>Returning Choices and Staff Allocation</b> and <b>School Year</b>, then click on <b>Send</b>.
+            </div>
+        );
+    };
 
     const [selectedChoices, setSelectedChoices] = React.useState(null);
     const [selectedYears, setSelectedYears] = React.useState(null);
+    const [openEdit, setOpenEdit] = React.useState(false);
 
     const sendChoicesHandler = (choices: any) => {
-        console.log("send choices", choices);
         setSelectedChoices(choices);
     };
     const sendYearsHandler = (choices: any) => {
-        console.log("send years", choices);
         setSelectedYears(choices);
     };
-
     const sendHandler = () => {
         props.selectChoicesYears(selectedChoices, selectedYears, props.userInfo);
     };
+    const updateHandler = () => {
+        setOpenEdit(true);
+    };
 
-    // let emailBtnText = '< Select Choices to send an email';
-    // const disabledHandler = () => {
-    //     if (selectedChoices && selectedYears && isSendingValid(selectedChoices, selectedYears)){
-    //         emailBtnText = 'Send';
-    //         return false;
-    //     }else{
-    //         emailBtnText = '< Select Choices to send an email';
-    //         return true;
-    //     }
-    // };
-
-    const buttonId = useId('targetButton');
-    const [teachingBubbleVisible, { toggle: toggleTeachingBubbleVisible }] = useBoolean(false);
+    // React.useEffect(()=>{
+    //     //
+    // }, [selectedChoices, selectedYears]);
 
     return(
         <div className={styles.empCard}>
@@ -84,61 +83,57 @@ export default function EmpCard (props: EmpCardProps) {
             </div>
             <div className={styles.empCardAlloc}>
                 <div className={styles.allocTop}>
-                    <AllocationChoices allocation={props.allocation} selectChoices={sendChoicesHandler} />
+                    <AllocationChoices 
+                        openEdit = {openEdit} 
+                        allocation={props.allocation} 
+                        selectChoices={sendChoicesHandler} 
+                    />
                     <hr/>
-                    <AllocationYears allocation={props.allocation} selectYears={sendYearsHandler} />
+                    <AllocationYears 
+                        openEdit = {openEdit} 
+                        allocation={props.allocation} 
+                        selectYears={sendYearsHandler} 
+                    />
                     <hr/>
                     <div className={styles.allocEmailBtn}>
                         {props.allocation && props.allocation.ApplicationType 
                             ?
                             <>
-                                <DefaultButton primary>Update</DefaultButton>
-                                <span className={styles.sentOn}>Sent on <b style={{color: '#2c8c89'}}>{sentOn(new Date(props.allocation.Modified))}</b></span>
+                                {openEdit
+                                ?
+                                    <>
+                                        {isSendingValid(selectedChoices, selectedYears)
+                                        ?
+                                            <DefaultButton primary onClick={sendHandler}>Send</DefaultButton>
+                                        :
+                                            <SelectBtn crcYr={props.crcYr} />
+                                        }
+                                    </>
+                                :
+                                    <DefaultButton primary onClick={updateHandler}>Update</DefaultButton>
+                                }
+                                <span className={styles.sentOn}>
+                                    <TooltipHost
+                                        content={<Tooltip />}
+                                        id={tooltipId}>
+                                        <Icon iconName='Info'/>
+                                    </TooltipHost>
+                                    <span>Sent on <b style={{color: '#2c8c89'}}>{sentOn(new Date(props.allocation.Modified))}</b></span>
+                                </span>
                             </>
                             :
                             <>
-                                {/* <DefaultButton disabled={disabledHandler()} onClick={sendHandler} primary>{emailBtnText}</DefaultButton> */}
-                                { selectedChoices && selectedYears && isSendingValid(selectedChoices, selectedYears) 
+                                {isSendingValid(selectedChoices, selectedYears)
                                 ?
-                                <DefaultButton primary onClick={sendHandler}>Send</DefaultButton>
+                                    <DefaultButton primary onClick={sendHandler}>Send</DefaultButton>
                                 :
-                                <>
-                                    <DefaultButton
-                                        id={buttonId}
-                                        onClick={toggleTeachingBubbleVisible}
-                                        text='Select'
-                                        iconProps={{iconName: 'Info12'}}
-                                    />
-                                    {teachingBubbleVisible && (
-                                        <TeachingBubble
-                                            target={`#${buttonId}`}
-                                            onDismiss={toggleTeachingBubbleVisible}
-                                            headline="Select Choices"
-                                            hasCloseButton
-                                            illustrationImage={{
-                                                    src: require('../../assets/check-help-community.png'), 
-                                                    alt: 'Help & Support!',
-                                                    height: '100px'
-                                                }}
-                                            >
-                                            Select the staff allocation choices and the school year to send an email to the employee. <br/><br/>
-                                            For each Relisting or Transfer you put select Current or Next for School Year. 
-                                            The Current is ${props.crcYr-1}-${props.crcYr} and the Next is ${props.crcYr}-${props.crcYr+1}
-                                        </TeachingBubble>
-                                    )}
-                                </>
+                                    <SelectBtn crcYr={props.crcYr} />
                                 }
                             </>
-                        }
+                        }   
                     </div>
                 </div>
-                {/* <hr/>
-                <div className={styles.allocBottom}>
-                    <DefaultButton primary>Update</DefaultButton>
-                </div> */}
-                {/* <SchoolYears allocation={props.allocation} /> */}
             </div>
-            
         </div>
     );
 }

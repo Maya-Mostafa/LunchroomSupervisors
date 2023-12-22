@@ -17,7 +17,9 @@ export default function AllocationChoices(props: AllocationChoicesProps) {
       textCode: 'RegularClasses',
       type: 'Regular',
       selectedBg : regBg,
+      origChecked: false,
       checked: false,
+      prevChecked: false,
       disabled: false,
     },
     {
@@ -25,7 +27,9 @@ export default function AllocationChoices(props: AllocationChoicesProps) {
       textCode: 'EarlyLearningPlan',
       type: 'Regular',
       selectedBg : regBg,
+      origChecked: false,
       checked: false,
+      prevChecked: false,
       disabled: false,
     },
     {
@@ -33,7 +37,9 @@ export default function AllocationChoices(props: AllocationChoicesProps) {
       textCode: 'Supply',
       type: 'Regular',
       selectedBg : regBg,
+      origChecked: false,
       checked: false,
+      prevChecked: false,
       disabled: false,
     },
     {
@@ -41,7 +47,9 @@ export default function AllocationChoices(props: AllocationChoicesProps) {
       textCode: 'SpecialNeeds',
       type: 'Regular',
       selectedBg : regBg,
+      origChecked: false,
       checked: false,
+      prevChecked: false,
       disabled: false,
     },
     {
@@ -49,7 +57,9 @@ export default function AllocationChoices(props: AllocationChoicesProps) {
       textCode: 'NotReturning',
       type: 'Irregular',
       selectedBg : noReturnBg,
+      origChecked: false,
       checked: false,
+      prevChecked: false,
       disabled: false,
     },
     {
@@ -57,7 +67,9 @@ export default function AllocationChoices(props: AllocationChoicesProps) {
       textCode: 'Resign',
       type: 'Irregular',
       selectedBg : resignBg,
+      origChecked: false,
       checked: false,
+      prevChecked: false,
       disabled: false,
     }
   ];
@@ -71,13 +83,22 @@ export default function AllocationChoices(props: AllocationChoicesProps) {
     if (selectedApplicationType){
       setAllocationState(allocationsConst.map((item: any)=>{
         if (selectedApplicationType.includes(item.textCode))
-          return {...item, checked: true, disabled: true};
+          return {...item, origChecked: true, checked: true, disabled: true};
         return {...item, disabled: true};
       }));
     }else{
       setAllocationState(allocationsConst);
     }
   }, [allocationProps]);
+
+  React.useEffect(()=>{
+    if (props.openEdit){
+      setAllocationState(allocationState.map((item: any)=>{
+        if (item.origChecked) return {...item, checked: false, prevChecked: true, disabled: false};
+        return {...item, disabled: false};
+      }));
+    }
+  }, [props.openEdit]);
 
   const onCheckHandler = (checked: boolean, text: string) => {
     const updatedChoices = allocationState.map((item: any)=>{
@@ -109,6 +130,7 @@ export default function AllocationChoices(props: AllocationChoicesProps) {
             selectedBg = {allocation.selectedBg}
             onCheckHandler={onCheckHandler}
             disabled = {allocation.disabled}
+            prevChecked = {allocation.prevChecked}
           />
         );
       })}
