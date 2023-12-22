@@ -257,20 +257,23 @@ export const sentOn = (modDate: Date) => {
   return  months[modDate.getMonth()] + ' ' + modDate.getDate();
 };
 export const isSendingValid = (choices: any, years: any) => {
-  let isChoicesValid = false, isYearsValid = false;
-  for (const choice of choices){
-    if (choice.checked){
-      isChoicesValid = true;
-      break;
+  if (choices && years){
+    let isChoicesValid = false, isYearsValid = false;
+    for (const choice of choices){
+      if (choice.checked){
+        isChoicesValid = true;
+        break;
+      }
     }
-  }
-  for (const year of years){
-    if (year.checked){
-      isYearsValid = true;
-      break;
+    for (const year of years){
+      if (year.checked){
+        isYearsValid = true;
+        break;
+      }
     }
+    return isChoicesValid && isYearsValid;
   }
-  return isChoicesValid && isYearsValid;
+  return false;
 };
 
 export const searchEmp = () => {
