@@ -8,6 +8,9 @@
   &.teams {
     font-family: $ms-font-family-fallbacks;
   }
+  h1, h2, h3, h4, h5{
+    font-weight: 600;
+  }
 }
 .peelLink {
   text-decoration: none;
@@ -163,5 +166,8 @@
   .sentOn{
     font-size: 11px;
     margin-top: 3px;
+    i{
+      margin-right: 2px;
+    }
   }
 }
