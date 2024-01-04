@@ -5,6 +5,7 @@ export interface EmpListProps{
     context: WebPartContext;
     crcYr: number;
     allocations: any;
-    allocationsCount: any;
+    // allocationsCount: any;
     selectChoicesYears: any;
+    employeesType: string;
 }

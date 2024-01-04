@@ -1,9 +1,10 @@
 import * as React from 'react';
 import styles from './LunchroomSupervisors.module.scss';
 import { ILunchroomSupervisorsProps } from './ILunchroomSupervisorsProps';
-import { getAllLocations, getSupervisorsInfo, getCRCYear, getCRCStatus, getEmpAllocations, objToMap, getAllocationCount } from '../Services/DataRequests';
+import { getAllLocations, getSupervisorsInfo, getCRCYear, getCRCStatus, objToMap, getSupervisorsTransfersInfo, getEmpAllocations, getEmpsGrpLunch } from '../Services/DataRequests';
 import EmpLocations from './EmpLocations/EmpLocations';
 import EmpList from './EmpList/EmpList';
+import AddEmp from './AddEmp/AddEmp';
 
 export default function LunchroomSupervisors(props: ILunchroomSupervisorsProps){
 
@@ -15,36 +16,59 @@ export default function LunchroomSupervisors(props: ILunchroomSupervisorsProps){
   const CRCYear = getCRCYear();
   const [ myLocations, setMyLocations ] = React.useState([]);
   const [empsList, setEmpsList] = React.useState([]);
+  const [empsTransferList, setEmpsTransferList] = React.useState([]);
   const [allocations, setAllocations] = React.useState([]);
-  const [allocationsCount, setAllocationsCount] = React.useState({regCount:0, earlyCount:0, supplyCount:0, needsCount:0});
+  const [allocationsTransfer, setAllocationsTransfer] = React.useState([]);
+  // const [allocationsCount, setAllocationsCount] = React.useState({regCount:0, earlyCount:0, supplyCount:0, needsCount:0});
+  const [empsGrpLunch, setEmpsGrpLunch] = React.useState([]);
 
   React.useEffect(()=>{
     //getEmpInfo(props.context, userEmail).then(r=>setUserInfo(r));
     // getMyLocsDpd(props.context).then(r=>setMyLocations(r));
     getAllLocations(props.context).then(r=>setMyLocations(r));
+    getEmpsGrpLunch(props.context).then(r=>setEmpsGrpLunch(r));
   }, []);
 
   const getSelectedLocHandler = (selLoc: string) => {
+    
+    // Current Employees
     getSupervisorsInfo(props.context, selLoc).then((supervisorsRes => {
       // Getting employees in the selected location
       setEmpsList(supervisorsRes);
-
       //Getting CRC status for employees in the selected location
       const updatedCrcEmpsList: any = [];
       for (let i=0; i<supervisorsRes.length; i++){
         getCRCStatus(props.context, supervisorsRes[i].MMHubEmployeeNo.replace('00','P'), CRCYear).then((crcStatus: any) => {
-          updatedCrcEmpsList.push({...supervisorsRes[i], crcStatus})
+          updatedCrcEmpsList.push({...supervisorsRes[i], crcStatus});
           if (i === supervisorsRes.length -1) setEmpsList(updatedCrcEmpsList);
         });
       }
-      
       // Getting employees allocations for the selected location & with formType equals 'Current'
       getEmpAllocations(props.context, selLoc, "Current").then((allocationsRes) => {
-        setAllocationsCount({...getAllocationCount(allocationsRes)});
+        // setAllocationsCount({...getAllocationCount(allocationsRes)});
         setAllocations(objToMap(allocationsRes, 'Title'));
       });
-      
     })); 
+
+    // Transferring Employees
+    getEmpAllocations(props.context, selLoc, "Transferring").then((allocationsRes) => {
+      if (allocationsRes.length !== 0){
+        const empsTransferEmails = allocationsRes.map((item: any) => item.Title);
+        getSupervisorsTransfersInfo(props.context, empsTransferEmails).then(supervisorsTransferRes => {
+          setEmpsTransferList(supervisorsTransferRes);
+          // Getting CRC status for employees in the selected location
+          const updatedCrcEmpsList: any = [];
+          for (let i=0; i<supervisorsTransferRes.length; i++){
+            getCRCStatus(props.context, supervisorsTransferRes[i].MMHubEmployeeNo.replace('00','P'), CRCYear).then((crcStatus: any) => {
+              updatedCrcEmpsList.push({...supervisorsTransferRes[i], crcStatus});
+              if (i === supervisorsTransferRes.length -1) setEmpsTransferList(updatedCrcEmpsList);
+            });
+          }
+        });
+      }
+      setAllocationsTransfer(objToMap(allocationsRes, 'Title'));
+    });
+
   };
 
   const selectChoicesYearsHandler = (choices: any, years: any, userInfo: any) => {
@@ -58,12 +82,40 @@ export default function LunchroomSupervisors(props: ILunchroomSupervisorsProps){
         myLocations={myLocations}
         getSelectedLoc={getSelectedLocHandler}
       />
+
+      <br/>
+
       <EmpList
         emps={empsList}
         context={props.context}
         crcYr = {CRCYear}
         allocations={allocations}
-        allocationsCount={allocationsCount}
+        // allocationsCount={allocationsCount}
+        selectChoicesYears={selectChoicesYearsHandler}
+        employeesType="Current"
+      />
+      
+      <hr/>
+      
+      <EmpList
+        emps={empsTransferList}
+        context={props.context}
+        crcYr = {CRCYear}
+        allocations={allocationsTransfer}
+        // allocationsCount={allocationsCount}
+        selectChoicesYears={selectChoicesYearsHandler}
+        employeesType="Transferring"
+      />
+
+      <hr/>
+
+      <br/>
+
+      <h2>Add Employee</h2>
+      <AddEmp 
+        emps={empsGrpLunch} 
+        context={props.context}
+        crcYr = {CRCYear}
         selectChoicesYears={selectChoicesYearsHandler}
       />
     </div>
