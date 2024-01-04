@@ -47,6 +47,23 @@ export const getEmpsInfoQuery = async (context: WebPartContext, query: string) =
       console.log("getEmpsInfoQuery fnc Error");
     }
 };
+export const getEmpsGrpLunch = async (context: WebPartContext) => {
+
+  const responseUrl = `https://pdsb1.sharepoint.com/sites/contentTypeHub/_api/web/lists/GetByTitle('Employees')/items?$filter=substringof('71', MMHubEmployeeGroup)&$top=1000`;
+
+  try{
+    const response = await context.spHttpClient.get(responseUrl, SPHttpClient.configurations.v1);
+    if (response.ok){
+      const results = await response.json();
+      console.log("getEmpsGrpLunch results", results);
+      if(results){
+        return results.value;
+      }
+    }
+  }catch(error){
+    console.log("getEmpsGrpLunch fnc Error");
+  }
+};
 
 /* Locations */
 export const getAllLocations = async (context: WebPartContext) : Promise <IDropdownOption[]> => {
@@ -122,7 +139,7 @@ export const getCRCStatus = async (context: WebPartContext, empId: string, CRCYr
     return results.odStatus;
 };
 
-/* Supervisors Info */
+/* Current Supervisors Info */
 export const getSupervisors = async (context:WebPartContext, locNo: string) => {
 
   const responseUrl = `https://pdsbserviceapi.azurewebsites.net/api/wcf/GetLunchRoomSupByLocation?LocationId=${locNo}`;
@@ -152,10 +169,29 @@ export const getSupervisorsInfo = async (context: WebPartContext, locNo: string)
   return [];
 };
 
+/* Transferring Supervisors Info */
+const empsEmailQuery = (emailsArr: any) : string => {
+  //const emailsArr = empsArr.map((item: any) => item.MMHubBoardEmail);
+  let query = '';
+  for (let i = 0; i < emailsArr.length; i++){
+    query += `MMHubBoardEmail eq '${emailsArr[i]}'`;
+    if (i !== emailsArr.length -1) query += ' or ';
+  }
+  return query;
+};
+export const getSupervisorsTransfersInfo = async (context: WebPartContext, empsArr: any) => {
+  const query = empsEmailQuery(empsArr);
+  const empInfoResults = await getEmpsInfoQuery(context, query);
+  return empInfoResults;
+};
+
 /* Allocations Info */
 export const getEmpAllocations = async (context: WebPartContext, locId: string, formType: string) => {
     //formType: Current, Transferring
     const responseUrl = `https://pdsb1.sharepoint.com/hr/business/apppackages/_api/web/lists/GetByTitle('LunchroomApplication')/items?$filter=FormType eq '${formType}' and SchoolLocationCode eq '${locId}'`;
+    
+    //testing site
+    //const responseUrl = `https://pdsb1.sharepoint.com/sites/Lunchroom/_api/web/lists/GetByTitle('LunchroomApplication')/items?$filter=FormType eq '${formType}' and SchoolLocationCode eq '${locId}'`;
 
     try{
         const response = await context.spHttpClient.get(responseUrl, SPHttpClient.configurations.v1);
@@ -169,6 +205,26 @@ export const getEmpAllocations = async (context: WebPartContext, locId: string, 
       }catch(error){
         console.log("userAllocations fnc Error");
       }
+}; 
+export const getAllEmpAllocations = async (context: WebPartContext, locId: string) => {
+  //formType: Current, Transferring
+  const responseUrl = `https://pdsb1.sharepoint.com/hr/business/apppackages/_api/web/lists/GetByTitle('LunchroomApplication')/items?$filter=SchoolLocationCode eq '${locId}'`;
+  
+  //testing site
+  //const responseUrl = `https://pdsb1.sharepoint.com/sites/Lunchroom/_api/web/lists/GetByTitle('LunchroomApplication')/items?$filter=FormType eq '${formType}' and SchoolLocationCode eq '${locId}'`;
+
+  try{
+      const response = await context.spHttpClient.get(responseUrl, SPHttpClient.configurations.v1);
+      if (response.ok){
+        const results = await response.json();
+        if(results){
+          return results.value;
+          // return objToMap(results.value, 'Title');
+        }
+      }
+    }catch(error){
+      console.log("userAllocations fnc Error");
+    }
 }; 
 export const getAllocationCount = (arr: any) => {
   let regCount = 0, earlyCount = 0, supplyCount = 0, needsCount = 0;
