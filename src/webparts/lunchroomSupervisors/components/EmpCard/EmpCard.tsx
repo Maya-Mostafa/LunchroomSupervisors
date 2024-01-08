@@ -12,7 +12,7 @@ import SelectBtn from '../SelectBtn/SelectBtn';
 
 export default function EmpCard (props: EmpCardProps) {
 
-    // console.log("EmpCardProps", props);
+    console.log("EmpCardProps", props);
 
     const tooltipId = useId('tooltip');
     const iconStyles: Partial<IIconStyles> = { root: { marginRight: 5 } };
@@ -43,7 +43,9 @@ export default function EmpCard (props: EmpCardProps) {
         setSelectedYears(choices);
     };
     const sendHandler = () => {
-        props.selectChoicesYears(selectedChoices, selectedYears, props.userInfo);
+        const isNewAlloc = props.allocation && props.allocation.ApplicationType ? false : true;
+        props.selectChoicesYears(selectedChoices, selectedYears, props.userInfo, props.formType, isNewAlloc, props.allocation);
+        if (isNewAlloc) props.clearPpl();
     };
     const updateHandler = () => {
         setOpenEdit(true);
@@ -110,7 +112,18 @@ export default function EmpCard (props: EmpCardProps) {
                                         }
                                     </>
                                 :
-                                    <DefaultButton primary onClick={updateHandler}>Update</DefaultButton>
+                                    <>
+                                    {props.allocation.ApplicationType.includes('Resign')
+                                        ?
+                                        <DefaultButton 
+                                            rel="noreferrer" target="_blank" data-interception="off" 
+                                            href={`https://pdsb1.sharepoint.com/sites/Lunchroom/Lists/LunchroomApplication/DispForm.aspx?ID=${props.allocation.ID}`} 
+                                            primary>View Letter
+                                        </DefaultButton>
+                                        :
+                                        <DefaultButton primary onClick={updateHandler}>Update</DefaultButton>    
+                                    }
+                                    </>
                                 }
                                 <span className={styles.sentOn}>
                                     <TooltipHost
