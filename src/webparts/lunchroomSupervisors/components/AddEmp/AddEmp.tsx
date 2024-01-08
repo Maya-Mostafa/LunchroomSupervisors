@@ -8,9 +8,11 @@ import { getCRCStatus, getEmpInfo } from '../../Services/DataRequests';
 export default function AddEmp(props: AddEmpProps){
 
     const [selectedEmp, setSelectedEmp] = React.useState(null); 
+    const [ppl, setPpl] = React.useState([]);
 
     const getPeoplePickerItems = (items: any[]) =>{
         console.log("getPeoplePickerItems", items);
+        setPpl(items);
         if (items.length !== 0){
             const empEmail = items[0].secondaryText;
             getEmpInfo(props.context, empEmail).then(res => {
@@ -23,9 +25,15 @@ export default function AddEmp(props: AddEmpProps){
         }
     };
 
-    // React.useEffect(()=>{
-    //     //
-    // }, [Object.keys(selectedEmp).length]);
+    const clearPplHandler = () => {
+        setSelectedEmp({});
+        setPpl([]);
+    };
+
+    React.useEffect(()=>{
+        //
+    }, [ppl.length]);
+
 
     return(
         <>
@@ -35,14 +43,15 @@ export default function AddEmp(props: AddEmpProps){
                 personSelectionLimit={1}
                 // groupName={'Group71-LunchroomSupervisors-DL@peelsb.com'} // Leave this blank in case you want to filter from all users
                 groupId={'2f6e1c92-abc1-4c52-a75b-73d6bf8d45f0'}
-                showtooltip={true}
+                showtooltip={false}
                 searchTextLimit={5}
                 onChange={getPeoplePickerItems}
                 principalTypes={[PrincipalType.User]}
                 resolveDelay={1000} 
+                defaultSelectedUsers={ppl}
             />
             <br/>
-            {selectedEmp && Object.keys(selectedEmp).length !== 0 &&
+            {ppl.length !==0 && selectedEmp && Object.keys(selectedEmp).length !== 0 &&
                 <EmpCard 
                     key = {selectedEmp.id}
                     context={props.context}
@@ -50,6 +59,8 @@ export default function AddEmp(props: AddEmpProps){
                     crcYr={props.crcYr}
                     allocation={null}
                     selectChoicesYears={props.selectChoicesYears}
+                    formType='Transferring'
+                    clearPpl={clearPplHandler}
                 />
             }
         </>
