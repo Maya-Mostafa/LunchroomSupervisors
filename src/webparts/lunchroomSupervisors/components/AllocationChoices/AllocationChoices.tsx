@@ -82,7 +82,7 @@ export default function AllocationChoices(props: AllocationChoicesProps) {
   React.useEffect(()=>{
     if (selectedApplicationType){
       setAllocationState(allocationsConst.map((item: any)=>{
-        if (selectedApplicationType.includes(item.textCode))
+        if (selectedApplicationType.includes(item.text))
           return {...item, origChecked: true, checked: true, disabled: true};
         return {...item, disabled: true};
       }));
