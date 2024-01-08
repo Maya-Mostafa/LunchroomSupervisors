@@ -6,4 +6,6 @@ export interface EmpCardProps{
     crcYr: number;
     allocation: any;
     selectChoicesYears: any;
+    formType: string;
+    clearPpl?: any;
 }
