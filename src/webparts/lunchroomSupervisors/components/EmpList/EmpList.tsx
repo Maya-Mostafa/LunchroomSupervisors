@@ -7,6 +7,7 @@ import { MessageBar, MessageBarType } from 'office-ui-fabric-react';
 export default function EmpList(props:EmpListProps){
 
     // console.log("EmpListProps", props);
+    const sortedEmps = props.emps.sort((a:any, b:any) => a.LastnameFirstname.localeCompare(b.LastnameFirstname));
 
     return(
         <>
@@ -40,7 +41,7 @@ export default function EmpList(props:EmpListProps){
                 </>
             }
             
-            {props.emps && props.emps.map((emp: any) => {
+            {props.emps && sortedEmps.map((emp: any) => {
                 return(
                     <EmpCard 
                         key = {emp.Id}
@@ -49,6 +50,7 @@ export default function EmpList(props:EmpListProps){
                         crcYr={props.crcYr}
                         allocation={props.allocations[emp.MMHubBoardEmail]}
                         selectChoicesYears={props.selectChoicesYears}
+                        formType={props.employeesType}
                     />
                 )    
             })}
