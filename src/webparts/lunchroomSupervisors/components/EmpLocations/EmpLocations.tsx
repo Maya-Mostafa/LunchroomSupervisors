@@ -16,7 +16,9 @@ export default function EmpLocations (props: EmpLocationsProps) {
     };
 
     return (
+        
 		<div className={styles.empLocations}>
+            
 			<Stack horizontal tokens={stackTokens} styles={stackStyles}>
                 <Dropdown
                     placeholder=''
@@ -25,8 +27,11 @@ export default function EmpLocations (props: EmpLocationsProps) {
                     onChange={onDpdChange}
                     // selectedKey={allLocations && allLocations[0] ? allLocations[0].key : ''}
                     selectedKey={selectedLoc}
+                    defaultSelectedKey={props.myLocations.length > 0 ? props.myLocations[0].key : ''}
                 />
 			</Stack>
+
 		</div>
+        
 	);
 }
