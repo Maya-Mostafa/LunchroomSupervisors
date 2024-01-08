@@ -4,6 +4,11 @@ import { AllocationDataType } from "./Types";
 import { IDropdownOption } from "office-ui-fabric-react";
 import { AadHttpClient } from '@microsoft/sp-http';
 
+const testSite = 'https://pdsb1.sharepoint.com/sites/Lunchroom';
+//const liveSite = 'https://pdsb1.sharepoint.com/hr/business/apppackages';
+const siteUrl = testSite;
+const contentTypeHubSiteUrl = 'https://pdsb1.sharepoint.com/sites/contentTypeHub';
+
 /* Utility Functions */
 export const objToMap = (arrObjs: any, key: string) => {
   return arrObjs.reduce((map: any, obj: any) => (map[obj[key]] = obj, map), {});
@@ -18,7 +23,7 @@ export const getEmpProfile = (email: string) => {
 };
 export const getEmpInfo = async (context: WebPartContext, email: string) => {
 
-  const responseUrl = `https://pdsb1.sharepoint.com/sites/contentTypeHub/_api/web/lists/GetByTitle('Employees')/items?$filter=MMHubBoardEmail eq '${email}'`;
+  const responseUrl = `${contentTypeHubSiteUrl}/_api/web/lists/GetByTitle('Employees')/items?$filter=MMHubBoardEmail eq '${email}'`;
 
   try{
     const response = await context.spHttpClient.get(responseUrl, SPHttpClient.configurations.v1);
@@ -34,7 +39,7 @@ export const getEmpInfo = async (context: WebPartContext, email: string) => {
   }
 };
 export const getEmpsInfoQuery = async (context: WebPartContext, query: string) => {
-  const responseUrl = `https://pdsb1.sharepoint.com/sites/contentTypeHub/_api/web/lists/GetByTitle('Employees')/items?$filter=${query}`;
+  const responseUrl = `${contentTypeHubSiteUrl}/_api/web/lists/GetByTitle('Employees')/items?$filter=${query}`;
     try{
       const response = await context.spHttpClient.get(responseUrl, SPHttpClient.configurations.v1);
       if (response.ok){
@@ -49,7 +54,7 @@ export const getEmpsInfoQuery = async (context: WebPartContext, query: string) =
 };
 export const getEmpsGrpLunch = async (context: WebPartContext) => {
 
-  const responseUrl = `https://pdsb1.sharepoint.com/sites/contentTypeHub/_api/web/lists/GetByTitle('Employees')/items?$filter=substringof('71', MMHubEmployeeGroup)&$top=1000`;
+  const responseUrl = `${contentTypeHubSiteUrl}/_api/web/lists/GetByTitle('Employees')/items?$filter=substringof('71', MMHubEmployeeGroup)&$top=1000`;
 
   try{
     const response = await context.spHttpClient.get(responseUrl, SPHttpClient.configurations.v1);
@@ -67,22 +72,23 @@ export const getEmpsGrpLunch = async (context: WebPartContext) => {
 
 /* Locations */
 export const getAllLocations = async (context: WebPartContext) : Promise <IDropdownOption[]> => {
-  const responseUrl : string = `https://pdsb1.sharepoint.com/sites/contentTypeHub/_api/web/Lists/GetByTitle('schools')/items?$top=400&$orderBy=School_x0020_Name`; 
+  const responseUrl : string = `${contentTypeHubSiteUrl}/_api/web/Lists/GetByTitle('schools')/items?$top=400&$orderBy=School_x0020_Name`; 
   const response = await context.spHttpClient.get(responseUrl, SPHttpClient.configurations.v1);
 
   if(response.ok){
       const results = await response.json();
-      return results.value.map((school: any) => {
-          return {
-              key: school.School_x0020_Location_x0020_Code, 
-              text: `${school.School_x0020_Name} (${school.School_x0020_Location_x0020_Code})`
-          }
+      const validLocs = results.value.filter((item:any) => item.School_x0020_Location_x0020_Code > 1000 && item.School_x0020_Location_x0020_Code < 3000)
+      return validLocs.map((school: any) => {
+        return {
+            key: school.School_x0020_Location_x0020_Code, 
+            text: `${school.School_x0020_Name} (${school.School_x0020_Location_x0020_Code})`
+        }
       });
   }
 
 };
 const getMyLocationsInfo = async (context: WebPartContext, locNum: string) =>{
-    const   restUrl = `/sites/contentTypeHub/_api/web/Lists/GetByTitle('schools')/items?$select=Title,School_x0020_My_x0020_School_x00,School_x0020_Name&$filter=Title eq '${locNum}'`,
+    const   restUrl = `${contentTypeHubSiteUrl}/_api/web/Lists/GetByTitle('schools')/items?$select=Title,School_x0020_My_x0020_School_x00,School_x0020_Name&$filter=Title eq '${locNum}'`,
             _data = await context.spHttpClient.get(restUrl, SPHttpClient.configurations.v1);
     let locInfo = {};
     
@@ -94,7 +100,7 @@ const getMyLocationsInfo = async (context: WebPartContext, locNum: string) =>{
 };
 const getMyLocations = async (context: WebPartContext, testingEmail: string) =>{
     const currUserEmail = testingEmail;
-    const restUrl = `/sites/contentTypeHub/_api/web/Lists/GetByTitle('Employees')/items?$filter=MMHubBoardEmail eq '${currUserEmail}'&$select=MMHubLocationNos`;
+    const restUrl = `${contentTypeHubSiteUrl}/_api/web/Lists/GetByTitle('Employees')/items?$filter=MMHubBoardEmail eq '${currUserEmail}'&$select=MMHubLocationNos`;
   
     let myLocsNum : [] = [];
     const myLocs = await context.spHttpClient.get(restUrl, SPHttpClient.configurations.v1).then(response => response.json());
@@ -188,10 +194,10 @@ export const getSupervisorsTransfersInfo = async (context: WebPartContext, empsA
 /* Allocations Info */
 export const getEmpAllocations = async (context: WebPartContext, locId: string, formType: string) => {
     //formType: Current, Transferring
-    const responseUrl = `https://pdsb1.sharepoint.com/hr/business/apppackages/_api/web/lists/GetByTitle('LunchroomApplication')/items?$filter=FormType eq '${formType}' and SchoolLocationCode eq '${locId}'`;
+    const responseUrl = `${siteUrl}/_api/web/lists/GetByTitle('LunchroomApplication')/items?$filter=FormType eq '${formType}' and SchoolLocationCode eq '${locId}'`;
     
     //testing site
-    //const responseUrl = `https://pdsb1.sharepoint.com/sites/Lunchroom/_api/web/lists/GetByTitle('LunchroomApplication')/items?$filter=FormType eq '${formType}' and SchoolLocationCode eq '${locId}'`;
+    // const responseUrl = `https://pdsb1.sharepoint.com/sites/Lunchroom/_api/web/lists/GetByTitle('LunchroomApplication')/items?$filter=FormType eq '${formType}' and SchoolLocationCode eq '${locId}'`;
 
     try{
         const response = await context.spHttpClient.get(responseUrl, SPHttpClient.configurations.v1);
@@ -208,11 +214,8 @@ export const getEmpAllocations = async (context: WebPartContext, locId: string, 
 }; 
 export const getAllEmpAllocations = async (context: WebPartContext, locId: string) => {
   //formType: Current, Transferring
-  const responseUrl = `https://pdsb1.sharepoint.com/hr/business/apppackages/_api/web/lists/GetByTitle('LunchroomApplication')/items?$filter=SchoolLocationCode eq '${locId}'`;
-  
-  //testing site
-  //const responseUrl = `https://pdsb1.sharepoint.com/sites/Lunchroom/_api/web/lists/GetByTitle('LunchroomApplication')/items?$filter=FormType eq '${formType}' and SchoolLocationCode eq '${locId}'`;
-
+  const responseUrl = `${siteUrl}/_api/web/lists/GetByTitle('LunchroomApplication')/items?$filter=SchoolLocationCode eq '${locId}'`;
+    
   try{
       const response = await context.spHttpClient.get(responseUrl, SPHttpClient.configurations.v1);
       if (response.ok){
@@ -236,32 +239,51 @@ export const getAllocationCount = (arr: any) => {
   }
   return {regCount, earlyCount, supplyCount, needsCount};
 }
-export const createAllocation = async (context: WebPartContext, allocationData : AllocationDataType, formType: string) => {
+export const resolveAllocationData = (choices: any, years: any, formType: string, userInfo:any, selectedLocation: {key:string, text:string}) :AllocationDataType => {
+  
+  const applicationType = choices.filter((item: any)=>item.checked).map((item: any)=>item.text);
+  const selectedSchoolYear = years.filter((item: any)=>item.checked)[0].textCode;
+
+  const data :AllocationDataType = {
+    ApplicationType: applicationType,
+    // ApplicationType1: applicationType[0],
+    // ApplicationType2: applicationType[1],
+    // ApplicationType3: applicationType[3],
+    EmailSent: false,
+    FirstName: userInfo.FirstName,
+    FormType: formType,
+    LastName: userInfo.LastName,
+    JobTitle: userInfo.JobTitle,
+    MMHubEmployeeName: userInfo.LastnameFirstname,
+    MMHubEmployeeNo: userInfo.MMHubEmployeeNo.replace('00','P'),
+    SchoolLocationCode: selectedLocation.key,
+    SchoolName: selectedLocation.text,
+    SelectedSchoolYear: selectedSchoolYear,
+    Title: userInfo.MMHubBoardEmail,
+  }
+  return data;
+};
+export const createAllocation = async (context: WebPartContext, allocationData : AllocationDataType) => {
   // for create allocation (formType: Current) or add and employee (formType: Transferring)
 
-    const responseUrl = `https://pdsb1.sharepoint.com/hr/business/apppackages/_api/web/lists/GetByTitle('LunchroomApplication')/items`;
+    const responseUrl = `${siteUrl}/_api/web/lists/GetByTitle('LunchroomApplication')/items`;
 
     const body: string = JSON.stringify({
-        ApplicationType: {
-            __metadata: {
-                type: "Collection(Edm.String)"
-            },
-            results: allocationData.ApplicationType
-        },
-        ApplicationType1: allocationData.ApplicationType1, 
-        ApplicationType2: allocationData.ApplicationType2, 
-        ApplicationType3: allocationData.ApplicationType3,
-        EmailSent: allocationData.EmailSent,
-        FirstName: allocationData.FirstName,
-        FormType: formType,
-        LastName: allocationData.LastName,
-        JobTitle: allocationData.JobTitle, 
-        MMHubEmployeeName: allocationData.MMHubEmployeeName,
-        MMHubEmployeeNo: allocationData.MMHubEmployeeNo,
-        SchoolLocationCode: allocationData.SchoolLocationCode,
-        SchoolName: allocationData.SchoolName,
-        SelectedSchoolYear: allocationData.SelectedSchoolYear,
-        Title: allocationData.Title
+      ApplicationType: allocationData.ApplicationType,
+      // ApplicationType1: allocationData.ApplicationType1, 
+      // ApplicationType2: allocationData.ApplicationType2, 
+      // ApplicationType3: allocationData.ApplicationType3,
+      EmailSent: allocationData.EmailSent,
+      FirstName: allocationData.FirstName,
+      FormType: allocationData.FormType,
+      LastName: allocationData.LastName,
+      JobTitle: allocationData.JobTitle, 
+      MMHubEmployeeName: allocationData.MMHubEmployeeName,
+      MMHubEmployeeNo: allocationData.MMHubEmployeeNo,
+      SchoolLocationCode: allocationData.SchoolLocationCode,
+      SchoolName: allocationData.SchoolName,
+      SelectedSchoolYear: allocationData.SelectedSchoolYear,
+      Title: allocationData.Title
     });
     const spOptions: ISPHttpClientOptions = {
         headers:{
@@ -276,19 +298,14 @@ export const createAllocation = async (context: WebPartContext, allocationData :
         console.log('New Allocation is added!');
     }
 };
-export const updateAllocation = async (context: WebPartContext, allocationData : AllocationDataType) => {
-    const responseUrl = `https://pdsb1.sharepoint.com/hr/business/apppackages/_api/web/lists/GetByTitle('LunchroomApplication')/items`;
+export const updateAllocation = async (context: WebPartContext, allocationData : AllocationDataType, itemId: string) => {
+    const responseUrl = `${siteUrl}/_api/web/lists/GetByTitle('LunchroomApplication')/items(${itemId})`;
 
     const body: string = JSON.stringify({
-        ApplicationType: {
-            __metadata: {
-                type: "Collection(Edm.String)"
-            },
-            results: allocationData.ApplicationType
-        },
-        ApplicationType1: allocationData.ApplicationType1, 
-        ApplicationType2: allocationData.ApplicationType2, 
-        ApplicationType3: allocationData.ApplicationType3,
+      ApplicationType: allocationData.ApplicationType,
+        // ApplicationType1: allocationData.ApplicationType1, 
+        // ApplicationType2: allocationData.ApplicationType2, 
+        // ApplicationType3: allocationData.ApplicationType3,
         EmailSent: allocationData.EmailSent,
         JobTitle: allocationData.JobTitle, 
         SelectedSchoolYear: allocationData.SelectedSchoolYear,
@@ -332,9 +349,7 @@ export const isSendingValid = (choices: any, years: any) => {
   return false;
 };
 
-export const searchEmp = () => {
-    return;
-};
+
 
 
 
