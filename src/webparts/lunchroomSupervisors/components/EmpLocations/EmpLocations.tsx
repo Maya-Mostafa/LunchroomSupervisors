@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { EmpLocationsProps } from "./EmpLocationsProps";
-import { Dropdown, Stack, IStackStyles } from 'office-ui-fabric-react';
+import { Dropdown, Stack } from 'office-ui-fabric-react';
 import styles from '../LunchroomSupervisors.module.scss';
 
 export default function EmpLocations (props: EmpLocationsProps) {
 
     const stackTokens = { childrenGap: 50 };
-    const stackStyles: Partial<IStackStyles> = { root: { width: 650 } };
+    // const stackStyles: Partial<IStackStyles> = { root: { width: 650 } };
 
     const [ selectedLoc, setSelectedLoc ] = React.useState('');
 
@@ -19,8 +19,8 @@ export default function EmpLocations (props: EmpLocationsProps) {
         
 		<div className={styles.empLocations}>
             
-			<Stack horizontal tokens={stackTokens} styles={stackStyles}>
-                <Dropdown
+			<Stack horizontal tokens={stackTokens} className={styles.empLocationsStack}>
+                <Dropdown 
                     placeholder=''
                     options={props.myLocations}
                     label='Select the School or Department'
@@ -28,7 +28,9 @@ export default function EmpLocations (props: EmpLocationsProps) {
                     // selectedKey={allLocations && allLocations[0] ? allLocations[0].key : ''}
                     selectedKey={selectedLoc}
                     defaultSelectedKey={props.myLocations.length > 0 ? props.myLocations[0].key : ''}
+                    className={styles.empLocsDdp}
                 />
+                <img height={120} src={require('../../assets/lunch.png')} />
 			</Stack>
 
 		</div>

@@ -7,7 +7,7 @@ import { MessageBar, MessageBarType } from 'office-ui-fabric-react';
 export default function EmpList(props:EmpListProps){
 
     // console.log("EmpListProps", props);
-    const sortedEmps = props.emps.sort((a:any, b:any) => a.LastnameFirstname.localeCompare(b.LastnameFirstname));
+    const sortedEmps = props.emps ? props.emps.sort((a:any, b:any) => a.LastnameFirstname.localeCompare(b.LastnameFirstname)) : [];
 
     return(
         <>
@@ -32,7 +32,7 @@ export default function EmpList(props:EmpListProps){
                 </>
             }
 
-            {props.emps && props.emps.length === 0 && 
+            {props.emps === undefined || props.emps && props.emps.length === 0 && 
                 <>
                     <h3>{props.employeesType} Employees</h3>
                     <MessageBar messageBarType={MessageBarType.warning}>

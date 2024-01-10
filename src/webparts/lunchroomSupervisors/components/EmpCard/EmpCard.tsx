@@ -12,7 +12,7 @@ import SelectBtn from '../SelectBtn/SelectBtn';
 
 export default function EmpCard (props: EmpCardProps) {
 
-    console.log("EmpCardProps", props);
+    // console.log("EmpCardProps", props);
 
     const tooltipId = useId('tooltip');
     const iconStyles: Partial<IIconStyles> = { root: { marginRight: 5 } };
