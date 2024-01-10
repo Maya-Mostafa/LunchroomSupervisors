@@ -5,7 +5,7 @@ import { getAllLocations, getSupervisorsInfo, getCRCYear, getCRCStatus, objToMap
 import EmpLocations from './EmpLocations/EmpLocations';
 import EmpList from './EmpList/EmpList';
 import AddEmp from './AddEmp/AddEmp';
-import { Spinner } from 'office-ui-fabric-react';
+import { Spinner, SpinnerSize } from 'office-ui-fabric-react';
 
 export default function LunchroomSupervisors(props: ILunchroomSupervisorsProps){
 
@@ -47,21 +47,24 @@ export default function LunchroomSupervisors(props: ILunchroomSupervisorsProps){
     // Current Employees
     getSupervisorsInfo(props.context, selLoc).then((supervisorsRes => {
       // Getting employees in the selected location
-      setEmpsList(supervisorsRes);
-      // console.log("supervisorsRes", supervisorsRes);
+      const supervisorsResFlat = supervisorsRes.flat();
+      setEmpsList(supervisorsResFlat);
       //Getting CRC status for employees in the selected location
-      const updatedCrcEmpsList: any = [];
-      for (let i=0; i<supervisorsRes.length; i++){
-        getCRCStatus(props.context, supervisorsRes[i].MMHubEmployeeNo.replace('00','P'), CRCYear).then((crcStatus: any) => {
-          updatedCrcEmpsList.push({...supervisorsRes[i], crcStatus});
-          // if (i === supervisorsRes.length -1) setEmpsList([...updatedCrcEmpsList]);
-          setEmpsList([...updatedCrcEmpsList]);
-        });
+      if(supervisorsResFlat){
+        const updatedCrcEmpsList: any = [];
+        for (let i=0; i<supervisorsResFlat.length; i++){
+          getCRCStatus(props.context, supervisorsResFlat[i].MMHubEmployeeNo.replace('00','P'), CRCYear).then((crcStatus: any) => {
+            updatedCrcEmpsList.push({...supervisorsResFlat[i], crcStatus});
+            // if (i === supervisorsRes.length -1) setEmpsList([...updatedCrcEmpsList]);
+            setEmpsList([...updatedCrcEmpsList]);
+          });
+        }
       }
       // Getting employees allocations for the selected location & with formType equals 'Current'
       getEmpAllocations(props.context, selLoc, "Current").then((allocationsRes) => {
         // setAllocationsCount({...getAllocationCount(allocationsRes)});
         setAllocations(objToMap(allocationsRes, 'Title'));
+        setPreloaderVisible(false);
       });
     })); 
   };
@@ -84,6 +87,7 @@ export default function LunchroomSupervisors(props: ILunchroomSupervisorsProps){
         });
       }
       setAllocationsTransfer(objToMap(allocationsRes, 'Title'));
+      setPreloaderVisible(false);
     });
   };
 
@@ -92,25 +96,28 @@ export default function LunchroomSupervisors(props: ILunchroomSupervisorsProps){
     const mySelectedLoc: string = myLocations.filter((item: any)=>item.key===selLoc)[0].text;
     setSelectedLocation({key:selLoc, text:mySelectedLoc.substring(0, mySelectedLoc.indexOf(' ('))});
     
-    //setPreloaderVisible(true);
+    setPreloaderVisible(true);
     loadCurrentSupervisorsAllocation(selLoc);//.then(()=>console.log("loadCurrentSupervisorsAllocation done"));
     loadTransferringSupervisorsAllocation(selLoc);//.then(()=>console.log("loadTransferringSupervisorsAllocation done"));
   };
 
+  const [processing, setProcessing] = React.useState(false);
+
   const selectChoicesYearsHandler = (choices: any, years: any, userInfo: any, formType: string, isNew: boolean, existingAlloc: any) => {
     //console.log("selectChoicesYearsUserHandler", choices, years, userInfo, formType);
     const allocationData = resolveAllocationData(choices, years, formType, userInfo, selectedLocation);
+    setProcessing(true);
     if (isNew) {
       createAllocation(props.context, allocationData).then(()=>{
         loadCurrentSupervisorsAllocation(selectedLocation.key);
         loadTransferringSupervisorsAllocation(selectedLocation.key);
-      });
+      }).then(()=> setProcessing(false));
     }
     else{
       updateAllocation(props.context, allocationData, existingAlloc.ID).then(()=>{
         loadCurrentSupervisorsAllocation(selectedLocation.key);
         loadTransferringSupervisorsAllocation(selectedLocation.key);
-      });
+      }).then(()=> setProcessing(false));
     }
   };
 
@@ -128,6 +135,10 @@ export default function LunchroomSupervisors(props: ILunchroomSupervisorsProps){
         <div>
             <Spinner label="Loading data, please wait..." ariaLive="assertive" labelPosition="right" />
         </div>
+      }
+
+      {processing &&
+        <div className={styles.overlayBg}><Spinner className={styles.overlaySpinner} size={SpinnerSize.large} /></div>
       }
 
       <EmpList

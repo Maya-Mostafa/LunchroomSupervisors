@@ -160,17 +160,39 @@ export const getSupervisorsInfo = async (context: WebPartContext, locNo: string)
 
   const supersPNos = await getSupervisors(context, locNo);
 
-  if (supersPNos){
+  if (supersPNos && supersPNos !== 'No record found'){
     const pNumsArr = JSON.parse(supersPNos).map((item: any) => item.P_NUMBER.replace('P','00'));
     
+    console.log("pNumsArr", pNumsArr);
+
     let query = '';
-    for (let i = 0; i < pNumsArr.length; i++){
-      query += `MMHubEmployeeNo eq '${pNumsArr[i]}'`;
-      if (i !== pNumsArr.length -1) query += ' or ';
+    let query2 = '';
+    if (pNumsArr.length > 40){
+      const pNumsArrBatch1 = pNumsArr.splice(0,40);
+      for (let i = 0; i < pNumsArrBatch1.length; i++){
+        query += `MMHubEmployeeNo eq '${pNumsArrBatch1[i].trim()}'`;
+        if (i !== pNumsArrBatch1.length -1) query += ' or ';
+      }
+      const empInfoResults = await getEmpsInfoQuery(context, query);
+
+      const pNumsArrBatch2 = pNumsArr;
+      for (let i = 0; i < pNumsArrBatch2.length; i++){
+        query2 += `MMHubEmployeeNo eq '${pNumsArrBatch2[i].trim()}'`;
+        if (i !== pNumsArrBatch2.length -1) query2 += ' or ';
+      }
+      const empInfoResults2 = await getEmpsInfoQuery(context, query2);
+
+      return Promise.all([empInfoResults, empInfoResults2]);
+
+    }else{
+      for (let i = 0; i < pNumsArr.length; i++){
+        query += `MMHubEmployeeNo eq '${pNumsArr[i].trim()}'`;
+        if (i !== pNumsArr.length -1) query += ' or ';
+      }
+      const empInfoResults = await getEmpsInfoQuery(context, query);
+      return empInfoResults;
     }
     
-    const empInfoResults = await getEmpsInfoQuery(context, query);
-    return empInfoResults;
   }
   return [];
 };
