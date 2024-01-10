@@ -156,34 +156,31 @@ export const getSupervisors = async (context:WebPartContext, locNo: string) => {
   const results = await response.json();
   return results;
 };
+const formRestQuery = (arr: any, filterField: string) : string => {
+  let query = '';
+  for (let i = 0; i < arr.length; i++){
+    query += `${filterField} eq '${arr[i].trim()}'`;
+    if (i !== arr.length -1) query += ' or ';
+  }
+  return query;
+};
 export const getSupervisorsInfo = async (context: WebPartContext, locNo: string) => {
-
   const supersPNos = await getSupervisors(context, locNo);
 
   if (supersPNos && supersPNos !== 'No record found'){
     const pNumsArr = JSON.parse(supersPNos).map((item: any) => item.P_NUMBER.replace('P','00'));
-    
-    console.log("pNumsArr", pNumsArr);
-
+    const empInfoPromisesArr = [];
+    const queryCounter = Math.ceil(pNumsArr.length / 40 );
     let query = '';
-    let query2 = '';
+
     if (pNumsArr.length > 40){
-      const pNumsArrBatch1 = pNumsArr.splice(0,40);
-      for (let i = 0; i < pNumsArrBatch1.length; i++){
-        query += `MMHubEmployeeNo eq '${pNumsArrBatch1[i].trim()}'`;
-        if (i !== pNumsArrBatch1.length -1) query += ' or ';
+      for (let i=0; i<queryCounter ; i++){
+        const pNumsArrBatch = pNumsArr.splice(0,40);
+        query = formRestQuery(pNumsArrBatch, 'MMHubEmployeeNo');
+        const empInfoResults = await getEmpsInfoQuery(context, query);
+        empInfoPromisesArr.push(empInfoResults);
       }
-      const empInfoResults = await getEmpsInfoQuery(context, query);
-
-      const pNumsArrBatch2 = pNumsArr;
-      for (let i = 0; i < pNumsArrBatch2.length; i++){
-        query2 += `MMHubEmployeeNo eq '${pNumsArrBatch2[i].trim()}'`;
-        if (i !== pNumsArrBatch2.length -1) query2 += ' or ';
-      }
-      const empInfoResults2 = await getEmpsInfoQuery(context, query2);
-
-      return Promise.all([empInfoResults, empInfoResults2]);
-
+      return Promise.all(empInfoPromisesArr);
     }else{
       for (let i = 0; i < pNumsArr.length; i++){
         query += `MMHubEmployeeNo eq '${pNumsArr[i].trim()}'`;
@@ -192,23 +189,13 @@ export const getSupervisorsInfo = async (context: WebPartContext, locNo: string)
       const empInfoResults = await getEmpsInfoQuery(context, query);
       return empInfoResults;
     }
-    
   }
   return [];
 };
 
 /* Transferring Supervisors Info */
-const empsEmailQuery = (emailsArr: any) : string => {
-  //const emailsArr = empsArr.map((item: any) => item.MMHubBoardEmail);
-  let query = '';
-  for (let i = 0; i < emailsArr.length; i++){
-    query += `MMHubBoardEmail eq '${emailsArr[i]}'`;
-    if (i !== emailsArr.length -1) query += ' or ';
-  }
-  return query;
-};
 export const getSupervisorsTransfersInfo = async (context: WebPartContext, empsArr: any) => {
-  const query = empsEmailQuery(empsArr);
+  const query = formRestQuery(empsArr, 'MMHubBoardEmail');
   const empInfoResults = await getEmpsInfoQuery(context, query);
   return empInfoResults;
 };
