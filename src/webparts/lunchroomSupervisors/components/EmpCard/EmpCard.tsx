@@ -106,7 +106,19 @@ export default function EmpCard (props: EmpCardProps) {
                                     <>
                                         {isSendingValid(selectedChoices, selectedYears)
                                         ?
-                                            <DefaultButton primary onClick={sendHandler}>Send</DefaultButton>
+                                            <>
+                                                {props.allocation.ApplicationType.includes('Resign')
+                                                    ?
+                                                    <DefaultButton 
+                                                        rel="noreferrer" target="_blank" data-interception="off" 
+                                                        href={`https://pdsb1.sharepoint.com/sites/Lunchroom/Lists/LunchroomApplication/DispForm.aspx?ID=${props.allocation.ID}`} 
+                                                        primary>View Letter
+                                                    </DefaultButton>
+                                                    :
+                                                    <DefaultButton primary onClick={sendHandler}>Send</DefaultButton>    
+                                                }
+                                            </>
+                                            
                                         :
                                             <SelectBtn crcYr={props.crcYr} />
                                         }
