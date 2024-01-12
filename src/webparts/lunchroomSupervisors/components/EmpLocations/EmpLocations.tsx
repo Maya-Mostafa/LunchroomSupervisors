@@ -30,7 +30,7 @@ export default function EmpLocations (props: EmpLocationsProps) {
                     defaultSelectedKey={props.myLocations.length > 0 ? props.myLocations[0].key : ''}
                     className={styles.empLocsDdp}
                 />
-                <img height={120} src={require('../../assets/lunch.png')} />
+                {/* <img height={120} src={require('../../assets/lunch.png')} /> */}
 			</Stack>
 
 		</div>
