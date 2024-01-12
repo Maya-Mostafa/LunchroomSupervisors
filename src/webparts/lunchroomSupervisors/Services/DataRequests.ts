@@ -205,9 +205,6 @@ export const getEmpAllocations = async (context: WebPartContext, locId: string, 
     //formType: Current, Transferring
     const responseUrl = `${siteUrl}/_api/web/lists/GetByTitle('LunchroomApplication')/items?$filter=FormType eq '${formType}' and SchoolLocationCode eq '${locId}'`;
     
-    //testing site
-    // const responseUrl = `https://pdsb1.sharepoint.com/sites/Lunchroom/_api/web/lists/GetByTitle('LunchroomApplication')/items?$filter=FormType eq '${formType}' and SchoolLocationCode eq '${locId}'`;
-
     try{
         const response = await context.spHttpClient.get(responseUrl, SPHttpClient.configurations.v1);
         if (response.ok){
