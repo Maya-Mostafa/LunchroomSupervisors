@@ -14,7 +14,7 @@ export default function EmpList(props:EmpListProps){
             
             {props.emps && props.emps.length !== 0 &&
                 <>
-                    <h3>{props.employeesType} Employees</h3>
+                    <h3>{props.employeesType} Employees ({props.emps.length})</h3>
                     <div className={styles.hdrCntnr}>
                         <div className={styles.hdrEmpInfo}>Employee Information</div>
                         <div className={styles.hdrChoices}>
@@ -34,7 +34,7 @@ export default function EmpList(props:EmpListProps){
 
             {props.emps === undefined || props.emps && props.emps.length === 0 && 
                 <>
-                    <h3>{props.employeesType} Employees</h3>
+                    <h3>{props.employeesType} Employees ({props.emps.length})</h3>
                     <MessageBar messageBarType={MessageBarType.warning}>
                         There are no {props.employeesType} Employees for this location.
                     </MessageBar>
