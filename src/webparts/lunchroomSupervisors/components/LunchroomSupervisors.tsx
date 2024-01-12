@@ -24,6 +24,7 @@ export default function LunchroomSupervisors(props: ILunchroomSupervisorsProps){
   // const [allocationsCount, setAllocationsCount] = React.useState({regCount:0, earlyCount:0, supplyCount:0, needsCount:0});
   // const [empsGrpLunch, setEmpsGrpLunch] = React.useState([]);
   const [preloaderVisible, setPreloaderVisible] = React.useState(true);
+  const [processing, setProcessing] = React.useState(false);
 
   React.useEffect(()=>{
     //getEmpInfo(props.context, userEmail).then(r=>setUserInfo(r));
@@ -43,9 +44,9 @@ export default function LunchroomSupervisors(props: ILunchroomSupervisorsProps){
     // getEmpsGrpLunch(props.context).then(r=>setEmpsGrpLunch(r));
   }, []);
 
-  const loadCurrentSupervisorsAllocation = async (selLoc: string) => {
-    // Current Employees
-    getSupervisorsInfo(props.context, selLoc).then((supervisorsRes => {
+  const loadCurrentSupervisorsAllocation = async (selLoc: string, callback: any) => {
+    //setEmpsList([]);
+    getSupervisorsInfo(props.context, selLoc).then(supervisorsRes => {
       // Getting employees in the selected location
       const supervisorsResFlat = supervisorsRes.flat();
       setEmpsList(supervisorsResFlat);
@@ -66,15 +67,14 @@ export default function LunchroomSupervisors(props: ILunchroomSupervisorsProps){
         setAllocations(objToMap(allocationsRes, 'Title'));
         setPreloaderVisible(false);
       });
-    })); 
+    }).then(()=>callback);
   };
-  const loadTransferringSupervisorsAllocation = async (selLoc: string) => {
-    // Transferring Employees
-    getEmpAllocations(props.context, selLoc, "Transferring").then((allocationsRes) => {
+  const loadTransferringSupervisorsAllocation = async (selLoc: string, callback: any) => {
+    setEmpsTransferList([]);
+    getEmpAllocations(props.context, selLoc, "Transferring").then(allocationsRes => {
       if (allocationsRes.length !== 0){
         const empsTransferEmails = allocationsRes.map((item: any) => item.Title);
         getSupervisorsTransfersInfo(props.context, empsTransferEmails).then(supervisorsTransferRes => {
-          // console.log("supervisorsTransferRes", supervisorsTransferRes);
           setEmpsTransferList(supervisorsTransferRes);
           // Getting CRC status for employees in the selected location
           const updatedCrcEmpsList: any = [];
@@ -88,7 +88,7 @@ export default function LunchroomSupervisors(props: ILunchroomSupervisorsProps){
       }
       setAllocationsTransfer(objToMap(allocationsRes, 'Title'));
       setPreloaderVisible(false);
-    });
+    }).then(()=>callback);
   };
 
   const getSelectedLocHandler = (selLoc: string) => {
@@ -96,12 +96,15 @@ export default function LunchroomSupervisors(props: ILunchroomSupervisorsProps){
     const mySelectedLoc: string = myLocations.filter((item: any)=>item.key===selLoc)[0].text;
     setSelectedLocation({key:selLoc, text:mySelectedLoc.substring(0, mySelectedLoc.indexOf(' ('))});
     
+    setEmpsList([]);
+    setEmpsTransferList([]);
+
     setPreloaderVisible(true);
-    loadCurrentSupervisorsAllocation(selLoc);//.then(()=>console.log("loadCurrentSupervisorsAllocation done"));
-    loadTransferringSupervisorsAllocation(selLoc);//.then(()=>console.log("loadTransferringSupervisorsAllocation done"));
+    loadCurrentSupervisorsAllocation(selLoc, setPreloaderVisible(false));//.then(()=>console.log("loadCurrentSupervisorsAllocation done"));
+    loadTransferringSupervisorsAllocation(selLoc, setPreloaderVisible(false));//.then(()=>console.log("loadTransferringSupervisorsAllocation done"));
   };
 
-  const [processing, setProcessing] = React.useState(false);
+  
 
   const selectChoicesYearsHandler = (choices: any, years: any, userInfo: any, formType: string, isNew: boolean, existingAlloc: any) => {
     //console.log("selectChoicesYearsUserHandler", choices, years, userInfo, formType);
@@ -109,15 +112,15 @@ export default function LunchroomSupervisors(props: ILunchroomSupervisorsProps){
     setProcessing(true);
     if (isNew) {
       createAllocation(props.context, allocationData).then(()=>{
-        loadCurrentSupervisorsAllocation(selectedLocation.key);
-        loadTransferringSupervisorsAllocation(selectedLocation.key);
-      }).then(()=> setProcessing(false));
+        if (formType === 'Current') loadCurrentSupervisorsAllocation(selectedLocation.key, setProcessing(false));
+        else loadTransferringSupervisorsAllocation(selectedLocation.key, setProcessing(false));
+      });
     }
     else{
       updateAllocation(props.context, allocationData, existingAlloc.ID).then(()=>{
-        loadCurrentSupervisorsAllocation(selectedLocation.key);
-        loadTransferringSupervisorsAllocation(selectedLocation.key);
-      }).then(()=> setProcessing(false));
+        if (formType === 'Current') loadCurrentSupervisorsAllocation(selectedLocation.key, setProcessing(false));
+        else loadTransferringSupervisorsAllocation(selectedLocation.key, setProcessing(false));
+      });
     }
   };
 
