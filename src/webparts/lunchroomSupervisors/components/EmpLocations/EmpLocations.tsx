@@ -12,7 +12,7 @@ export default function EmpLocations (props: EmpLocationsProps) {
 
     const onDpdChange = (event: React.FormEvent<HTMLDivElement>, item: any): void => {
         setSelectedLoc(item.key);
-        props.getSelectedLoc(item.key);
+        props.getSelectedLoc(item);
     };
 
     return (

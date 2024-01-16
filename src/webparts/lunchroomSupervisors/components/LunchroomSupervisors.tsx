@@ -37,14 +37,14 @@ export default function LunchroomSupervisors(props: ILunchroomSupervisorsProps){
         });
       }else{
         setMyLocations(myLocsRes);
-        getSelectedLocHandler(myLocsRes[0].key);
-        setPreloaderVisible(false);
+        getSelectedLocHandler(myLocsRes[0]);
+        // setPreloaderVisible(false);
       }
     });
     // getEmpsGrpLunch(props.context).then(r=>setEmpsGrpLunch(r));
   }, []);
 
-  const loadCurrentSupervisorsAllocation = async (selLoc: string, callback: any) => {
+  const loadCurrentSupervisorsAllocation = async (selLoc: string, callback?: any) => {
     //setEmpsList([]);
     getSupervisorsInfo(props.context, selLoc).then(supervisorsRes => {
       // Getting employees in the selected location
@@ -65,11 +65,12 @@ export default function LunchroomSupervisors(props: ILunchroomSupervisorsProps){
       getEmpAllocations(props.context, selLoc, "Current").then((allocationsRes) => {
         // setAllocationsCount({...getAllocationCount(allocationsRes)});
         setAllocations(objToMap(allocationsRes, 'Title'));
-        setPreloaderVisible(false);
+        //setPreloaderVisible(false);
       });
-    }).then(()=>callback);
+      callback;
+    });
   };
-  const loadTransferringSupervisorsAllocation = async (selLoc: string, callback: any) => {
+  const loadTransferringSupervisorsAllocation = async (selLoc: string, callback?: any) => {
     setEmpsTransferList([]);
     getEmpAllocations(props.context, selLoc, "Transferring").then(allocationsRes => {
       if (allocationsRes.length !== 0){
@@ -87,21 +88,20 @@ export default function LunchroomSupervisors(props: ILunchroomSupervisorsProps){
         });
       }
       setAllocationsTransfer(objToMap(allocationsRes, 'Title'));
-      setPreloaderVisible(false);
+      // setPreloaderVisible(false);
     }).then(()=>callback);
   };
 
-  const getSelectedLocHandler = (selLoc: string) => {
-    selLoc = selLoc.trim();
-    const mySelectedLoc: string = myLocations.filter((item: any)=>item.key===selLoc)[0].text;
-    setSelectedLocation({key:selLoc, text:mySelectedLoc.substring(0, mySelectedLoc.indexOf(' ('))});
+  const getSelectedLocHandler = (selLoc: any) => {
+
+    setSelectedLocation({key:selLoc.key.trim(), text:selLoc.text.substring(0, selLoc.text.indexOf(' (')), area:selLoc.area});
     
     setEmpsList([]);
     setEmpsTransferList([]);
 
-    setPreloaderVisible(true);
-    loadCurrentSupervisorsAllocation(selLoc, setPreloaderVisible(false));//.then(()=>console.log("loadCurrentSupervisorsAllocation done"));
-    loadTransferringSupervisorsAllocation(selLoc, setPreloaderVisible(false));//.then(()=>console.log("loadTransferringSupervisorsAllocation done"));
+    //setPreloaderVisible(true);
+    loadCurrentSupervisorsAllocation(selLoc.key, setPreloaderVisible(false));
+    loadTransferringSupervisorsAllocation(selLoc.key);
   };
 
   
@@ -170,7 +170,7 @@ export default function LunchroomSupervisors(props: ILunchroomSupervisorsProps){
 
       <br/>
 
-      <h2>Add Employee</h2>
+      <h2>Add Transferring Employee</h2>
       <AddEmp 
         // emps={empsGrpLunch} 
         context={props.context}
