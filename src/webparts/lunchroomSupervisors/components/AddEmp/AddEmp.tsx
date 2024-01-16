@@ -39,7 +39,7 @@ export default function AddEmp(props: AddEmpProps){
         <>
             <PeoplePicker
                 context={props.context as any}
-                titleText="Search an employee"
+                titleText="Enter their email address"
                 personSelectionLimit={1}
                 // groupName={'Group71-LunchroomSupervisors-DL@peelsb.com'} // Leave this blank in case you want to filter from all users
                 groupId={'2f6e1c92-abc1-4c52-a75b-73d6bf8d45f0'}
