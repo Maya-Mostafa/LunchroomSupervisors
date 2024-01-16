@@ -12,6 +12,7 @@ export interface AllocationDataType {
     MMHubEmployeeNo?: string,
     SchoolLocationCode?: string,
     SchoolName?: string,
+    Area?: string,
     SelectedSchoolYear: string,
     Title?: string
 }

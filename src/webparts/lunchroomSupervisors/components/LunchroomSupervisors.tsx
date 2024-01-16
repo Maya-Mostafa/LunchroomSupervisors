@@ -20,7 +20,7 @@ export default function LunchroomSupervisors(props: ILunchroomSupervisorsProps){
   const [empsTransferList, setEmpsTransferList] = React.useState([]);
   const [allocations, setAllocations] = React.useState([]);
   const [allocationsTransfer, setAllocationsTransfer] = React.useState([]);
-  const [selectedLocation, setSelectedLocation] = React.useState({key:'', text:''});
+  const [selectedLocation, setSelectedLocation] = React.useState({key:'', text:'', area:''});
   // const [allocationsCount, setAllocationsCount] = React.useState({regCount:0, earlyCount:0, supplyCount:0, needsCount:0});
   // const [empsGrpLunch, setEmpsGrpLunch] = React.useState([]);
   const [preloaderVisible, setPreloaderVisible] = React.useState(true);

@@ -81,7 +81,8 @@ export const getAllLocations = async (context: WebPartContext) : Promise <IDropd
       return validLocs.map((school: any) => {
         return {
             key: school.School_x0020_Location_x0020_Code, 
-            text: `${school.School_x0020_Name} (${school.School_x0020_Location_x0020_Code})`
+            text: `${school.School_x0020_Name} (${school.School_x0020_Location_x0020_Code})`,
+            area: school.Area
         }
       });
   }
@@ -245,7 +246,7 @@ export const getAllocationCount = (arr: any) => {
   }
   return {regCount, earlyCount, supplyCount, needsCount};
 }
-export const resolveAllocationData = (choices: any, years: any, formType: string, userInfo:any, selectedLocation: {key:string, text:string}) :AllocationDataType => {
+export const resolveAllocationData = (choices: any, years: any, formType: string, userInfo:any, selectedLocation: {key:string, text:string, area: string}) :AllocationDataType => {
   
   const applicationType = choices.filter((item: any)=>item.checked).map((item: any)=>item.text);
   const selectedSchoolYear = years.filter((item: any)=>item.checked)[0].textCode;
@@ -264,6 +265,7 @@ export const resolveAllocationData = (choices: any, years: any, formType: string
     MMHubEmployeeNo: userInfo.MMHubEmployeeNo.replace('00','P'),
     SchoolLocationCode: selectedLocation.key,
     SchoolName: selectedLocation.text,
+    Area: selectedLocation.area,
     SelectedSchoolYear: selectedSchoolYear,
     Title: userInfo.MMHubBoardEmail,
   }
@@ -288,6 +290,7 @@ export const createAllocation = async (context: WebPartContext, allocationData :
       MMHubEmployeeNo: allocationData.MMHubEmployeeNo,
       SchoolLocationCode: allocationData.SchoolLocationCode,
       SchoolName: allocationData.SchoolName,
+      Area: allocationData.Area,
       SelectedSchoolYear: allocationData.SelectedSchoolYear,
       Title: allocationData.Title
     });
