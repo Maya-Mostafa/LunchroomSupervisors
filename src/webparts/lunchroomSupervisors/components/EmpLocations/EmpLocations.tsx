@@ -23,7 +23,7 @@ export default function EmpLocations (props: EmpLocationsProps) {
                 <Dropdown 
                     placeholder=''
                     options={props.myLocations}
-                    label='Select the School or Department'
+                    label='Select the School'
                     onChange={onDpdChange}
                     // selectedKey={allLocations && allLocations[0] ? allLocations[0].key : ''}
                     selectedKey={selectedLoc}
