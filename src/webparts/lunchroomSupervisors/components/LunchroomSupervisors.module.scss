@@ -1,7 +1,6 @@
 @import '~@fluentui/react/dist/sass/References.scss';
 
 .lunchroomSupervisors {
-  overflow: hidden;
   padding: 1em;
   color: "[theme:bodyText, default: #323130]";
   color: var(--bodyText);
@@ -37,6 +36,7 @@
   }
   .empPersonaCntnr{
     width: 250px;
+    min-width: 250px;
     max-width: 250px;
     box-shadow: 0px 0px 3px 2px #ddd;
     padding: 20px;
@@ -102,6 +102,7 @@
   font-weight: 600;
   font-size: 13px;
   margin: 25px 0 10px 0;
+  width: 1095px;
   .hdrEmpInfo{
     width: 292px;
   }
@@ -125,6 +126,11 @@
   .hdrEmail{
     width: 96px;
   }
+}
+
+.supervisorsAllocations{
+  overflow: auto;
+  padding-left: 5px;
 }
 
 .allocationsChoicesCntnr{

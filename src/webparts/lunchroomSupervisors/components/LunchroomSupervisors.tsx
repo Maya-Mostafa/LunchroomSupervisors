@@ -144,39 +144,42 @@ export default function LunchroomSupervisors(props: ILunchroomSupervisorsProps){
         <div className={styles.overlayBg}><Spinner className={styles.overlaySpinner} size={SpinnerSize.large} /></div>
       }
 
-      <EmpList
-        emps={empsList}
-        context={props.context}
-        crcYr = {CRCYear}
-        allocations={allocations}
-        // allocationsCount={allocationsCount}
-        selectChoicesYears={selectChoicesYearsHandler}
-        employeesType="Current"
-      />
+      <div className={styles.supervisorsAllocations}>
+        <EmpList
+          emps={empsList}
+          context={props.context}
+          crcYr = {CRCYear}
+          allocations={allocations}
+          // allocationsCount={allocationsCount}
+          selectChoicesYears={selectChoicesYearsHandler}
+          employeesType="Current"
+        />
+        
+        <hr/>
+        
+        <EmpList
+          emps={empsTransferList}
+          context={props.context}
+          crcYr = {CRCYear}
+          allocations={allocationsTransfer}
+          // allocationsCount={allocationsCount}
+          selectChoicesYears={selectChoicesYearsHandler}
+          employeesType="Transferring"
+        />
       
-      <hr/>
-      
-      <EmpList
-        emps={empsTransferList}
-        context={props.context}
-        crcYr = {CRCYear}
-        allocations={allocationsTransfer}
-        // allocationsCount={allocationsCount}
-        selectChoicesYears={selectChoicesYearsHandler}
-        employeesType="Transferring"
-      />
 
-      <hr/>
+        <hr/>
 
-      <br/>
+        <br/>
 
-      <h2>Add Transferring Employee</h2>
-      <AddEmp 
-        // emps={empsGrpLunch} 
-        context={props.context}
-        crcYr = {CRCYear}
-        selectChoicesYears={selectChoicesYearsHandler}
-      />
+        <h2>Add Transferring Employee</h2>
+        <AddEmp 
+          // emps={empsGrpLunch} 
+          context={props.context}
+          crcYr = {CRCYear}
+          selectChoicesYears={selectChoicesYearsHandler}
+        />
+      </div>
     </div>
   );
 }
