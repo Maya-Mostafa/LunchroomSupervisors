@@ -1,5 +1,6 @@
 export interface AllocationDataType {
     ApplicationType: [], 
+    ApplicationTypeChoices: string,
     // ApplicationType1: string, 
     // ApplicationType2: string, 
     // ApplicationType3: string,

@@ -253,6 +253,7 @@ export const resolveAllocationData = (choices: any, years: any, formType: string
 
   const data :AllocationDataType = {
     ApplicationType: applicationType,
+    ApplicationTypeChoices: applicationType.join(', '),
     // ApplicationType1: applicationType[0],
     // ApplicationType2: applicationType[1],
     // ApplicationType3: applicationType[3],
@@ -278,6 +279,7 @@ export const createAllocation = async (context: WebPartContext, allocationData :
 
     const body: string = JSON.stringify({
       ApplicationType: allocationData.ApplicationType,
+      ApplicationTypeChoices: allocationData.ApplicationType.join(', '),
       // ApplicationType1: allocationData.ApplicationType1, 
       // ApplicationType2: allocationData.ApplicationType2, 
       // ApplicationType3: allocationData.ApplicationType3,
@@ -312,6 +314,7 @@ export const updateAllocation = async (context: WebPartContext, allocationData :
 
     const body: string = JSON.stringify({
       ApplicationType: allocationData.ApplicationType,
+      ApplicationTypeChoices: allocationData.ApplicationType.join(', '),
         // ApplicationType1: allocationData.ApplicationType1, 
         // ApplicationType2: allocationData.ApplicationType2, 
         // ApplicationType3: allocationData.ApplicationType3,
